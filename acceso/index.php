@@ -1,5 +1,6 @@
 <?php
-
+require_once("php/limpiaTexto.php");
+require_once("php/baseDatos.php");
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -24,12 +25,35 @@
 <article>
 <div id="formulario">
 <h1>Acceso usuarios</h1>
-<form autocomplete="off" action="index.php" method="post" name="formulario">
-<input type="text" name="nombre" required placeholder="Nombre"/><br/>
-<input type="password" name="clave" required placeholder="Clave"/><br/>
-<input type="submit" value="Entrar" class="boton"/>
-</form>
-</div>
+<?php
+if(isset($_POST['nombre'])&& isset($_POST['clave'])){
+	$nombre=limpiaTexto($_POST['nombre']);
+	$clave=limpiaTexto($_POST['clave']);
+	$conexion=conectarBase();
+	$entra=accesoUsuario($conexion,$nombre,$clave);
+	if($entra){
+			if(session_status()!== PHP_SESSION_ACTIVE){
+			session_start();}
+				$_SESSION["autenticado"]="si";
+				$_SESSION["usuario"]=$nombre;
+				echo "<script>alert('Bienvenido.');
+				window.location.href=\"dentroUsuario.php\"</script>";
+			}else{
+				echo"<script>alert('Error, intentalo de nuevo.');
+				window.location.href=\"index.php\"</script>";
+			}
+	} else {?>
+	<form autocomplete="off" action="index.php" method="post" name="formulario">
+	<input type="text" name="nombre" required placeholder="Nombre"/><br/>
+	<input type="password" name="clave" required placeholder="Clave"/><br/>
+	<input type="submit" value="Entrar" class="boton"/>
+	</form>
+	</div>
+	<?php
+		}
+
+?>
+
 </article>
 </section>
 <aside></aside>
